@@ -13,14 +13,18 @@ public class Person {
     @Id
     @GeneratedValue
     private int id;
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
+
     @Column(name = "surname", nullable = false)
     private String surname;
+
     @Column(name = "date", nullable = false)
     @DateTimeFormat(pattern = "yyyy.mm.dd")
     @Temporal(TemporalType.DATE)
     private Date date;
+
     @Column(name = "phone")
     private String phone;
 
@@ -35,15 +39,12 @@ public class Person {
         this.id = id;
     }
 
-    public Person(String firstName, String surname, String date, String ... phone) throws ParseException {
-
+    public Person(String firstName, String surname, String date, String... phone) throws ParseException {
         InputUserValidator validator = new InputUserValidator();
         this.firstName = validator.nameValidator(firstName);
         this.surname = validator.nameValidator(surname);
         this.date = validator.dateValidator(date);
-        if(phone.length == 1 && validator.numberValidator(phone[0])) this.phone = phone[0];
-
-
+        if (phone.length == 1 && validator.numberValidator(phone[0])) this.phone = phone[0];
     }
 
     @Override

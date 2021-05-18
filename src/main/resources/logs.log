@@ -1,0 +1,6 @@
+2021-05-18 10:59:25 INFO  ParserService:56 - Trying to return userList
+2021-05-18 11:45:23 WARN  ParserService:77 - Bad request
+2021-05-18 11:45:59 INFO  ParserService:56 - Trying to return userList
+2021-05-18 11:47:24 INFO  ParserService:81 - trying to save person from csv to db
+2021-05-18 11:47:57 INFO  ParserService:56 - Trying to return userList
+2021-05-18 15:39:22 INFO  ParserService:81 - trying to save person from csv to db
