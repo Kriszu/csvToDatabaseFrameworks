@@ -24,7 +24,7 @@ import java.util.*;
 @RestController
 public class TestController {
 
-    private static String UPLOADED_FOLDER = "C:\\Users\\karol\\IdeaProjects\\csvToDatabaseFrameworks\\src\\main\\resources\\uploadedFiles\\";
+    private static String UPLOADED_FOLDER = "";
     final static Logger logger = Logger.getLogger(ParserService.class);
 
     @Autowired
@@ -33,12 +33,12 @@ public class TestController {
     @Autowired
     private PersonRepo personRepo;
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteUser(@PathVariable int id) {
+    @DeleteMapping("/delete")
+    public void deleteUser(@RequestParam int id) {
         Optional<Person> person = Optional.ofNullable(personRepo.findById(id));
         if(person.isPresent()){
             personRepo.deleteById(id);
-            logger.info(person.get().toString() + " deleted");
+            logger.info(person.get() + " deleted");
         } else {
             logger.info("There is no user with id: " + id);
         }
@@ -46,13 +46,12 @@ public class TestController {
 
     @DeleteMapping("/deleteAll")
     public void clearDatabase() {
-        List<Person> usersBeforeDeletion = personRepo.findAll();
         personRepo.deleteAll();
-        List<Person> usersAfterDeletion = personRepo.findAll();
-        if(usersAfterDeletion.size() - usersBeforeDeletion.size() == usersAfterDeletion.size()){
+        List<Person> users = personRepo.findAll();
+        if(users.size() == 0) {
             logger.info("All users were deleted");
         } else {
-            logger.info("Some users weren't deleted");
+            logger.info("Users weren't deleted: " + users);
         }
     }
 
@@ -113,7 +112,7 @@ public class TestController {
         }
         try {
             logger.info("trying to save person from csv to db");
-            parserService.csvPersonToDb(uploadFile.getName());
+            parserService.csvPersonToDb(uploadFile.getOriginalFilename());
         } catch (IOException e) {
             e.printStackTrace();
         }

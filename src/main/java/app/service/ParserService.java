@@ -28,7 +28,7 @@ public class ParserService {
     PersonRepo personRepo;
 
     public void csvPersonToDb(String fileName) throws IOException {
-        Path myPath = Paths.get("C:\\Users\\karol\\IdeaProjects\\csvToDatabaseFrameworks\\src\\main\\resources\\uploadedFiles\\" + fileName);
+        Path myPath = Paths.get("" + fileName);
         CSVParser parser = new CSVParserBuilder().withSeparator(';').build();
 
         try (BufferedReader br = Files.newBufferedReader(myPath,
