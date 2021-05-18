@@ -29,7 +29,6 @@ public class ParserService {
 
     public void csvPersonToDb(String fileName) throws IOException {
         Path myPath = Paths.get("C:\\Users\\karol\\IdeaProjects\\csvToDatabaseFrameworks\\src\\main\\resources\\uploadedFiles\\" + fileName);
-
         CSVParser parser = new CSVParserBuilder().withSeparator(';').build();
 
         try (BufferedReader br = Files.newBufferedReader(myPath,
@@ -45,6 +44,8 @@ public class ParserService {
                         if (!personRepo.existsByPhone(row[3])) {
                             personRepo.save(person);
                             logger.info("Saved person to database: " + person.toString());
+                        } else {
+                            logger.info("Person didn't save due to phone already exist" + person.toString());
                         }
                     } else {
                         personRepo.save(person);
