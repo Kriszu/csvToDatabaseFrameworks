@@ -1,7 +1,6 @@
 package app.model;
 
 import app.validator.InputUserValidator;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.text.ParseException;
@@ -20,10 +19,8 @@ public class Person {
     @Column(name = "surname", nullable = false)
     private String surname;
 
-    @Column(name = "date", nullable = false)
-    @DateTimeFormat(pattern = "yyyy.mm.dd")
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    @Column(name = "age", nullable = false)
+    private int age;
 
     @Column(name = "phone")
     private String phone;
@@ -39,11 +36,11 @@ public class Person {
         this.id = id;
     }
 
-    public Person(String firstName, String surname, String date, String... phone) throws ParseException {
+    public Person(String firstName, String surname, String age, String... phone) throws ParseException {
         InputUserValidator validator = new InputUserValidator();
         this.firstName = validator.nameValidator(firstName);
         this.surname = validator.nameValidator(surname);
-        this.date = validator.dateValidator(date);
+        this.age = validator.countAge(age);
         if (phone.length == 1 && validator.numberValidator(phone[0])) this.phone = phone[0];
     }
 
@@ -52,7 +49,7 @@ public class Person {
         return "Person{" +
                 "firstName='" + firstName + '\'' +
                 ", surname='" + surname + '\'' +
-                ", date='" + date + '\'' +
+                ", age='" + age + '\'' +
                 ", phoneNumber='" + phone + '\'' +
                 '}';
     }
@@ -73,12 +70,12 @@ public class Person {
         this.surname = surname;
     }
 
-    public Date getDate() {
-        return date;
+    public int getAge() {
+        return age;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setAge(int age) {
+        this.age = age;
     }
 
     public String getPhone() {

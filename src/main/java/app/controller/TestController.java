@@ -5,8 +5,12 @@ import app.repository.PersonRepo;
 import app.service.ParserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,10 +20,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.*;
 
 @RestController
 public class TestController {
@@ -51,10 +52,28 @@ public class TestController {
         return new ResponseEntity<>(personRepo.countAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/userList")
-    public ResponseEntity<List<Person>> userList() {
-        logger.info("Trying to return userList");
-        return new ResponseEntity<>(personRepo.findByOrderByDate(), HttpStatus.OK);
+    @GetMapping("/findUsersBySurname")
+    public ResponseEntity<List<Person>> findUsersBySurname(@RequestParam String surname) {
+        return new ResponseEntity<>(personRepo.findAllBySurname(surname), HttpStatus.OK);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<Map<String, Object>> users(@RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "5") int size) {
+        try {
+            List<Person> users;
+            Pageable paging = PageRequest.of(page, size);
+            Page<Person> pageUsers = personRepo.findByOrderByAge(paging);
+            users = pageUsers.getContent();
+            Map<String, Object> resposne = new HashMap<>();
+            resposne.put("users", users);
+            resposne.put("currentPage", pageUsers.getNumber());
+            resposne.put("totalItems", pageUsers.getTotalElements());
+            resposne.put("totalPages", pageUsers.getTotalPages());
+            return new ResponseEntity<>(resposne, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/theOldestPersonWithNumber")
@@ -79,7 +98,7 @@ public class TestController {
         }
         try {
             logger.info("trying to save person from csv to db");
-            parserService.csvPersonToDb(uploadFile.getOriginalFilename());
+            parserService.csvPersonToDb(uploadFile.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,17 +106,16 @@ public class TestController {
     }
 
     private void saveUploadedFiles(List<MultipartFile> files) throws IOException {
-        Stream<Path> filesList = Files.walk(Paths.get(UPLOADED_FOLDER));
-
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
-                continue;
+                logger.info(file.getOriginalFilename() + "is empty!");
+            } else {
+                boolean check = new File(UPLOADED_FOLDER, Objects.requireNonNull(file.getOriginalFilename())).exists();
+                if (check) throw new FileAlreadyExistsException("File exists");
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
+                Files.write(path, bytes);
             }
-            boolean check = new File(UPLOADED_FOLDER, Objects.requireNonNull(file.getOriginalFilename())).exists();
-            if (check) throw new FileAlreadyExistsException("File exists");
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
-            Files.write(path, bytes);
         }
     }
 }
