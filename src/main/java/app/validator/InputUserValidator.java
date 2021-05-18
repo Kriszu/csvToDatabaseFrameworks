@@ -6,8 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
 import java.util.Date;
 
 public class InputUserValidator {
@@ -37,11 +35,11 @@ public class InputUserValidator {
                 .toLocalDate();
     }
 
-    private String deleteSpacesFromString(String s){
+    private String deleteSpacesFromString(String s) {
         return s.replaceAll(" ", "");
     }
 
-    private String changeFirstLetterToUppercase(String s){
-        return s.replaceFirst(String.valueOf(s.charAt(0)),Character.toString(s.charAt(0)).toUpperCase());
+    private String changeFirstLetterToUppercase(String s) {
+        return s.replaceFirst(String.valueOf(s.charAt(0)), Character.toString(s.charAt(0)).toUpperCase());
     }
 }

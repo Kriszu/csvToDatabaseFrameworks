@@ -4,7 +4,6 @@ import app.validator.InputUserValidator;
 
 import javax.persistence.*;
 import java.text.ParseException;
-import java.util.Date;
 
 @Entity
 public class Person {
