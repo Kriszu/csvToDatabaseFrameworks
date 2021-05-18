@@ -35,25 +35,39 @@ public class TestController {
 
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable int id) {
-        logger.info("Trying to delete user with id: " + id);
-        personRepo.deleteById(id);
+        Optional<Person> person = Optional.ofNullable(personRepo.findById(id));
+        if(person.isPresent()){
+            personRepo.deleteById(id);
+            logger.info(person.get().toString() + " deleted");
+        } else {
+            logger.info("There is no user with id: " + id);
+        }
     }
 
     @DeleteMapping("/deleteAll")
     public void clearDatabase() {
-        logger.info("Trying to delete table");
+        List<Person> usersBeforeDeletion = personRepo.findAll();
         personRepo.deleteAll();
+        List<Person> usersAfterDeletion = personRepo.findAll();
+        if(usersAfterDeletion.size() - usersBeforeDeletion.size() == usersAfterDeletion.size()){
+            logger.info("All users were deleted");
+        } else {
+            logger.info("Some users weren't deleted");
+        }
     }
 
     @GetMapping("/countUsers")
     public ResponseEntity<Long> countUsers() {
-        logger.info("Trying to return amount of users");
-        return new ResponseEntity<>(personRepo.countAll(), HttpStatus.OK);
+        Long amount = personRepo.countAll();
+        logger.info(amount == 1 ? "There is: " + amount + " person" : "There is: " + amount + " users");
+        return new ResponseEntity<>(amount, HttpStatus.OK);
     }
 
     @GetMapping("/findUsersBySurname")
     public ResponseEntity<List<Person>> findUsersBySurname(@RequestParam String surname) {
-        return new ResponseEntity<>(personRepo.findAllBySurname(surname), HttpStatus.OK);
+        List<Person> users = personRepo.findAllBySurname(surname);
+        logger.info("There is: " + users.toString() + "with surname: " + surname);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @GetMapping("/users")
@@ -64,12 +78,13 @@ public class TestController {
             Pageable paging = PageRequest.of(page, size);
             Page<Person> pageUsers = personRepo.findByOrderByAge(paging);
             users = pageUsers.getContent();
-            Map<String, Object> resposne = new HashMap<>();
-            resposne.put("users", users);
-            resposne.put("currentPage", pageUsers.getNumber());
-            resposne.put("totalItems", pageUsers.getTotalElements());
-            resposne.put("totalPages", pageUsers.getTotalPages());
-            return new ResponseEntity<>(resposne, HttpStatus.OK);
+            Map<String, Object> respone = new HashMap<>();
+            respone.put("users", users);
+            respone.put("currentPage", pageUsers.getNumber());
+            respone.put("totalItems", pageUsers.getTotalElements());
+            respone.put("totalPages", pageUsers.getTotalPages());
+            logger.info("There is: " + users);
+            return new ResponseEntity<>(respone, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -77,8 +92,9 @@ public class TestController {
 
     @GetMapping("/theOldestPersonWithNumber")
     public ResponseEntity<Person> theOldestPersonWithNumber() {
-        logger.info("Trying to return the oldest person with number");
-        return new ResponseEntity<>(personRepo.theOldestPersonWithPhoneNumber(), HttpStatus.OK);
+        Person person = personRepo.theOldestPersonWithPhoneNumber();
+        logger.info("Returned oldest person with number: " + person);
+        return new ResponseEntity<>(person, HttpStatus.OK);
     }
 
     @PostMapping("/uploadFile")

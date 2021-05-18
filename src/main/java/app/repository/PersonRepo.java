@@ -20,6 +20,8 @@ public interface PersonRepo extends JpaRepository<Person, Integer> {
     @Query("SELECT p from Person p where p.phone IS NOT NULL AND p.age = (SELECT max(p.age) from Person p)")
     Person theOldestPersonWithPhoneNumber();
 
+    Person findById(int Id);
+
     Page<Person> findByOrderByAge(Pageable pageable);
 
     ArrayList<Person> findAllBySurname(String surname);
